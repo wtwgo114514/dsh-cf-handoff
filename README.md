@@ -691,9 +691,14 @@ Neither the smoke test nor the unit tests reach the network or open a window;
 `openBrowser: false` exercises exactly the headless path that must work with no
 opener available.
 
-CI (`.github/workflows/ci.yml`) runs `npm test` on Node 20, 22 and 24. The other
-three commands stay local by design: they need an installed DSH profile, a real
-`dsh` binary, and — for the last one — a desktop session.
+CI (`.github/workflows/ci.yml`) runs `npm test` on Node 22 and 24, on both Linux
+and Windows. Node 20 is deliberately out of the matrix: `npm test` hands a glob
+to `node --test`, which Node 20 reads as a literal path
+(`Could not find '.../test/*.test.mjs'`) because glob expansion in the test
+runner only arrived in Node 21 — and 20 is past end of life anyway.
+
+The other three commands stay local by design: they need an installed DSH
+profile, a real `dsh` binary, and — for the last one — a desktop session.
 
 ### 8.1 The two acceptance scenarios
 

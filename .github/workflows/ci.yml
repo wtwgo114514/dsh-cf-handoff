@@ -22,7 +22,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        node: [20, 22, 24]
+        # 22 and 24 only: `npm test` passes a glob to `node --test`, and Node 20
+        # treats it as a literal path ("Could not find '.../test/*.test.mjs'") -
+        # glob expansion in the test runner arrived in Node 21. Node 20 is also
+        # out of maintenance (EOL 2026-04-30), so supporting it buys nothing.
+        node: [22, 24]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
