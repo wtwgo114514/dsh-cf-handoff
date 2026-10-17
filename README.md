@@ -539,6 +539,10 @@ it mounts as a **profile layer** rather than needing a hand-written row:
 dsh plugin add <path-or-tarball> --profile web
 ```
 
+From a clone, that is just `dsh plugin add ./dsh-cf-handoff --profile web`; the
+profile records the spec verbatim, so a `link:`-style development checkout keeps
+picking up edits without reinstalling.
+
 `dsh plugin add` reconciles `dsh.profile.bundles` against the installed state and
 appends this package automatically, because the resolved manifest declares
 `dsh.bundle`. Verify with:
@@ -684,6 +688,10 @@ Two facts it pinned down that a fake cannot show, both of which changed the code
 Neither the smoke test nor the unit tests reach the network or open a window;
 `openBrowser: false` exercises exactly the headless path that must work with no
 opener available.
+
+CI (`.github/workflows/ci.yml`) runs `npm test` on Node 20, 22 and 24. The other
+three commands stay local by design: they need an installed DSH profile, a real
+`dsh` binary, and — for the last one — a desktop session.
 
 ### 8.1 The two acceptance scenarios
 

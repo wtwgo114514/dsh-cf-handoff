@@ -1,0 +1,29 @@
+# Unit tests only.
+#
+# `test:smoke` loads the *installed* @deepseek-ai/cordis, dsh-web and
+# dsh-user-questions out of a DSH profile, and the two acceptance suites run a
+# real `dsh` binary and open a real browser. None of that exists on a runner, so
+# CI covers the pure and injectable layers and the rest stays local — see
+# README §8 for what each suite needs.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm test
