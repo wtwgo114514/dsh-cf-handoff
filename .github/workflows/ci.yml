@@ -14,10 +14,14 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # Windows is in the matrix on purpose: the opener is platform-dispatched and
+    # the first CI run was green on Windows, red on Linux, because one test built
+    # its fake staging root as `C:/fake-tmp`. Both platforms now have to pass.
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest]
         node: [20, 22, 24]
     steps:
       - uses: actions/checkout@v4

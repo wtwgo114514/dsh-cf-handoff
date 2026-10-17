@@ -10,6 +10,7 @@
 
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { tmpdir } from 'node:os';
 import { join, sep } from 'node:path';
 
 import {
@@ -20,7 +21,11 @@ import {
 	STAGING_PREFIX
 } from '../lib/browser-open.js';
 
-const TMP_ROOT = join('C:', 'fake-tmp');
+// The library resolves the staging root, so a fake relative one such as
+// `C:/fake-tmp` becomes `<cwd>/C:/fake-tmp` on POSIX and the prefix assertion
+// below fails there — CI caught exactly that on all three Node versions. Pinning
+// the fake root under the real temp directory keeps this file platform-neutral.
+const TMP_ROOT = join(tmpdir(), 'dsh-cf-handoff-test-root');
 
 /**
  * Build a handoff over in-memory fakes.
