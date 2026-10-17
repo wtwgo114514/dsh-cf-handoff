@@ -1,0 +1,43 @@
+// Editor / opt-in type checking for dsh-cf-handoff.
+//
+// THERE IS NO BUILD STEP. Cordis loads this package's `lib/*.js` as plain ESM;
+// nothing here is compiled, and `main` points straight at source. This file
+// exists so editors type-check the JSDoc annotations that document the harness
+// contracts, and so `tsc --noEmit` can be run deliberately.
+//
+// TypeScript is deliberately NOT a dependency: the plugin has one runtime
+// dependency (`@deepseek-ai/schemastery`) and must load inside a DSH profile
+// without pulling a compiler in. If you want to run the check, supply your own:
+//
+//   npx --yes typescript@latest tsc --noEmit -p .
+//
+// The harness packages are optional peers, so by default `@deepseek-ai/*`
+// imports do not resolve from this directory and the check reports them as
+// missing modules. Point `paths` at an installed profile to fix that — replace
+// the placeholder below with your profile's package root, which is
+// `<DSH_HOME>/profiles/node_modules`:
+//
+//   "paths": {
+//     "@deepseek-ai/*": ["C:/Users/<you>/.dsh/profiles/node_modules/@deepseek-ai/*"]
+//   }
+//
+// The mapping is left commented out rather than guessed, because a wrong
+// absolute path silently degrades every harness contract to `any` — which is
+// worse than an honest unresolved-import error.
+{
+	"compilerOptions": {
+		"target": "ES2023",
+		"lib": ["ES2023"],
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"allowJs": true,
+		"checkJs": true,
+		"noEmit": true,
+		"strict": true,
+		"skipLibCheck": true,
+		"resolveJsonModule": true,
+		"forceConsistentCasingInFileNames": true,
+		"types": ["node"]
+	},
+	"include": ["lib/**/*.js", "test/**/*.mjs"]
+}

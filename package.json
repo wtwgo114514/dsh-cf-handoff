@@ -1,0 +1,72 @@
+{
+  "name": "dsh-cf-handoff",
+  "version": "0.1.0",
+  "description": "Cloudflare human-handoff layer for DSH web_fetch: when a fetch hits a Cloudflare interstitial, open the URL in the user's own browser, pause the agent, and resume from the human's answer.",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "cloudflare",
+    "web-fetch",
+    "human-in-the-loop"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./agent-correlation": "./lib/agent-correlation.js",
+    "./agent-scope": "./lib/agent-scope.js",
+    "./detect": "./lib/cf-detect.js",
+    "./browser-open": "./lib/browser-open.js",
+    "./native-open": "./lib/native-open.js",
+    "./handoff": "./lib/handoff.js",
+    "./provider": "./lib/provider.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\"",
+    "test:smoke": "node test/live-smoke.mjs",
+    "test:all": "node --test \"test/*.test.mjs\" && node test/live-smoke.mjs",
+    "acceptance:headless": "node test/acceptance-headless.mjs",
+    "acceptance:browser": "node test/acceptance-browser.mjs"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.2",
+    "@deepseek-ai/dsh-web": "^0.1.5-rc.2",
+    "@deepseek-ai/dsh-user-questions": "^0.1.5-rc.2",
+    "@deepseek-ai/dsh-tools": "^0.1.5-rc.2"
+  },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "^3.18.2"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-web": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-user-questions": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-tools": {
+      "optional": true
+    }
+  }
+}

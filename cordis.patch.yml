@@ -1,0 +1,77 @@
+# The dsh-cf-handoff bundle patch: one row, mounted into a live profile.
+#
+# The package is a single self-contained plugin - every row resolves inside the
+# package itself - so the whole thing installs from one tarball via
+# `dsh plugin add`, and the patch contributes exactly one row.
+#
+# WHAT THE ROW DOES
+# `dsh-cf-handoff` wraps `ctx.web.fetch` and watches the responses for a
+# Cloudflare interstitial. Row order carries no load semantics in DSH
+# (activation is service-availability driven), so this row needs no position
+# relative to `web`, `web-fetch-http`, or `tool-web`: it declares
+# `inject: ['web', 'userQuestions', 'tools']` and the loader mounts it once those
+# services exist. Placing it after the web rows below is for readers only.
+#
+# `tools` is injected for `tools/pre-execute` alone, and only to learn *which*
+# agent a fetch belongs to: the Web GUI's question answerer is composed on the
+# Agent-scoped waterfall, so a question asked without an agent never reaches the
+# browser. See the "one thing that makes the handoff actually work" section of
+# README.md.
+#
+# WHY IT IS NOT A FETCH PROVIDER
+# It deliberately does NOT register a second `WebFetchProvider`. `dsh-web`'s
+# resolver requires exactly one available provider when `fetchProvider` is
+# unconfigured and fails with `WEB_PROVIDER_AMBIGUOUS` otherwise, and a
+# duplicate provider id throws `WEB_DUPLICATE_PROVIDER` - so registering one
+# would permanently change provider selection for every unrelated fetch. The
+# wrapper decorates the service method instead, which is disposable and leaves
+# the provider registry untouched.
+#
+# PER-PRESET NOTE
+# `tool-web` composes `web_fetch` per agent preset, and the `pentest` preset
+# ships `fetch: false`. This row is preset-independent: with `web_fetch` off,
+# nothing calls the seam and the plugin stays idle. The `openBrowser` and
+# `enabled` config keys below turn each half off without touching the host rows.
+
+- insert:
+    - id: cf-handoff
+      name: dsh-cf-handoff
+      config:
+        # Detection threshold. A title-only "Just a moment..." interstitial at
+        # HTTP 403 scores 14; an ordinary page that merely mentions Cloudflare
+        # scores 0. Raise to 16+ to hand off only on URL markers and the full
+        # JavaScript shell; lower to ~6 for maximum recall at the cost of false
+        # positives. See the "Detection" section of README.md for the score table.
+        minScore: 12
+
+        # Per-fetch handoff budget. 1 means: ask once, retry once, then fail with
+        # the URL. This is what stops a page that keeps re-challenging from
+        # looping forever; a value of 0 is legal and makes the plugin report the
+        # challenge without ever asking.
+        maxAttempts: 1
+
+        # Open the challenged URL in the user's default browser. The opener is a
+        # *path* opener (`openNativePath`), so the plugin writes a small local
+        # bootstrap page that links the real URL and opens that file. Set false
+        # on a headless deployment: the handoff notice still carries the URL.
+        openBrowser: true
+
+        # How the plugin treats the fetch call it is sitting inside.
+        #
+        # notify (default) - report the challenge and return. The fetch does not
+        #   wait for anyone; the agent is told to await the human with
+        #   `ask_user_question`, which declares no tool budget and is skipped by
+        #   the timeout policy. Correct wherever `web_fetch` keeps its default
+        #   30 s budget: that policy aborts the call and substitutes
+        #   `tool call timed out after Nms`, so an in-call wait is not merely slow,
+        #   it deletes the explanation.
+        #
+        # inline - ask from inside the fetch and retry after the answer. Only works
+        #   when the calling tool's budget is at least `minHumanBudgetMs`; otherwise
+        #   the plugin refuses the wait instead of being killed mid-question. Raise
+        #   `tool-web`'s `fetchTimeoutMs` to enable this on `web_fetch`.
+        mode: notify
+
+        # Smallest tool-call budget an in-call wait is allowed to start inside, in
+        # milliseconds. Ignored in notify mode.
+        minHumanBudgetMs: 120000
