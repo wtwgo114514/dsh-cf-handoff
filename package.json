@@ -11,6 +11,15 @@
     "human-in-the-loop"
   ],
   "license": "MIT",
+  "author": "wtwgo114514",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wtwgo114514/dsh-cf-handoff.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wtwgo114514/dsh-cf-handoff/issues"
+  },
+  "homepage": "https://github.com/wtwgo114514/dsh-cf-handoff#readme",
   "type": "module",
   "main": "lib/index.js",
   "exports": {

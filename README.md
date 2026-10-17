@@ -1,5 +1,7 @@
 # dsh-cf-handoff
 
+[![ci](https://github.com/wtwgo114514/dsh-cf-handoff/actions/workflows/ci.yml/badge.svg)](https://github.com/wtwgo114514/dsh-cf-handoff/actions/workflows/ci.yml)
+
 A Cloudflare human-handoff layer for DeepSeek Harness `web_fetch`.
 
 When a fetch hits a Cloudflare interstitial, the agent cannot get through by
